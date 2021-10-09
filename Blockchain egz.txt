@@ -1,0 +1,36 @@
+{
+    previous_hash
+    timestamp
+    version
+    merkle_root_hash
+    difficulty
+    nonce
+    {
+        hash_of_the_next_4_lines
+        timestamp
+        Universe_itself
+        reciever_public_key
+        1000
+    }
+    {
+        hash_of_the_next_4_lines
+        timestamp
+        sender_public_key
+        reciever_public_key
+        amount
+    }
+    {
+        hash_of_the_next_4_lines
+        timestamp
+        sender_public_key
+        reciever_public_key
+        amount
+    }
+    {
+        hash_of_the_next_4_lines
+        timestamp
+        sender_public_key
+        reciever_public_key
+        amount
+    }
+}
