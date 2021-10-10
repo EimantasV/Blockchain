@@ -74,20 +74,14 @@ int main()
     {
         uint8_t * hash = HashRaw(block+to_string(i));
         bool solved=true;
-        for(int a=0;a<stoi(temp.difficultyTarget)/2;a++)
-        {
-            if(hash[a]!=0)
+            for (int a = 0; a < 20; a++)
             {
-                solved=false;
+                if ((hash[a / 8] >> (7 - (a % 8))) != 0)
+                {
+                    solved = false;
+                    break;
+                }
             }
-        }
-        if(stoi(temp.difficultyTarget)%2==1)
-        {
-            if((hash[stoi(temp.difficultyTarget)/2]>>4)!=0)
-            {
-                solved=false;
-            }
-        }
         if(solved)
         {
             cout << "code: " << i <<endl;

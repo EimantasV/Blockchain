@@ -63,6 +63,7 @@ void CountMemes(string userid)
         else if(read=="}" && !isTransaction)
         {
             isBlock=false;
+            temp.transactionsCount=0;
             continue;
         }
         else if(read=="{" && isBlock)
@@ -142,12 +143,13 @@ int main()
     while(onMenu)
     {
         cin >> input;
-        onMenu=false;
+        //onMenu=false;
 
         switch (((int)input[0]-'0'))
         {
 
         case 1:
+            cout << "Note: useless function\n";
             cout <<"Memes: "<< user.memes<<endl;
             break;
 

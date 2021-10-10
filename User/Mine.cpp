@@ -2,7 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <time.h>
-#include<cmath>
+#include <cmath>
+#include <unordered_map>
+#include <algorithm>
 #include "../HashNew.h"
 
 using namespace std;
@@ -59,7 +61,9 @@ void ReadChain(vector<Block> &Chain)
         else if (read == "}" && !isTransaction)
         {
             isBlock = false;
+            //cout << "count: " << temp.transactionsCount<<endl;
             Chain.push_back(temp);
+            temp.transactionsCount=0; // bruh to find this
             continue;
         }
         else if (read == "{" && isBlock)
@@ -151,83 +155,207 @@ string GetMerkleHash(Transaction transactions[], int n)
     {
         hashes1[i] = HashHex(transactions[i].id + transactions[i].timestamp + transactions[i].sender + transactions[i].reciever + transactions[i].amount);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes1[n] = hashes1[n-1];
-        n+=1;
+        hashes1[n] = hashes1[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes2[i] = HashHex(hashes1[i*2]+hashes1[i*2+1]);
+        hashes2[i] = HashHex(hashes1[i * 2] + hashes1[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes2[n] = hashes2[n-1];
-        n+=1;
+        hashes2[n] = hashes2[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes3[i] = HashHex(hashes2[i*2]+hashes2[i*2+1]);
+        hashes3[i] = HashHex(hashes2[i * 2] + hashes2[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes3[n] = hashes3[n-1];
-        n+=1;
+        hashes3[n] = hashes3[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes4[i] = HashHex(hashes3[i*2]+hashes3[i*2+1]);
+        hashes4[i] = HashHex(hashes3[i * 2] + hashes3[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes4[n] = hashes4[n-1];
-        n+=1;
+        hashes4[n] = hashes4[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes5[i] = HashHex(hashes4[i*2]+hashes4[i*2+1]);
+        hashes5[i] = HashHex(hashes4[i * 2] + hashes4[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes5[n] = hashes5[n-1];
-        n+=1;
+        hashes5[n] = hashes5[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes6[i] = HashHex(hashes5[i*2]+hashes5[i*2+1]);
+        hashes6[i] = HashHex(hashes5[i * 2] + hashes5[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes6[n] = hashes6[n-1];
-        n+=1;
+        hashes6[n] = hashes6[n - 1];
+        n += 1;
     }
-    n/=2;
-        for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes7[i] = HashHex(hashes6[i*2]+hashes6[i*2+1]);
+        hashes7[i] = HashHex(hashes6[i * 2] + hashes6[i * 2 + 1]);
     }
-    if(n%2==1)
+    if (n % 2 == 1)
     {
-        hashes7[n] = hashes7[n-1];
-        n+=1;
+        hashes7[n] = hashes7[n - 1];
+        n += 1;
     }
-    n/=2;
-    for(int i=0;i< n ;i++)
+    n /= 2;
+    for (int i = 0; i < n; i++)
     {
-        hashes8[i] = HashHex(hashes7[i*2]+hashes7[i*2+1]);
+        hashes8[i] = HashHex(hashes7[i * 2] + hashes7[i * 2 + 1]);
     }
     return hashes8[0];
+}
 
+void ValidateTransactionPool(vector<Block> &chain, vector<Transaction> &pool)
+{
+    //Validate hash...       (if SSH, then validate signature)
+    for (auto poolit = pool.begin(); poolit != pool.end(); poolit++) // looping transaction pool
+        if ((*poolit).id != HashHex((*poolit).timestamp + (*poolit).sender + (*poolit).reciever + (*poolit).amount))
+        {
+            //remove transaction
+            pool.erase(poolit);
+            poolit--;
+        }
+
+    //Check if repeated
+    for (auto it = chain.end() - 1; it != chain.begin(); it--)           // first block doesn't matter. Looping blockchain backwards
+        for (auto poolit = pool.begin(); poolit != pool.end(); poolit++) // looping transaction pool
+            for (int i = 0; i < (*it).transactionsCount; i++)            // looping block transactions
+                if ((*it).transactions[i].id == (*poolit).id)            //  checking transaction from pool is already in block
+                {
+                    //remove transaction
+                    pool.erase(poolit);
+                    poolit--;
+                }
+
+    //check transaction sum validity, overspending protection
+    unordered_map<string, double> wallets;
+    for (auto poolit = pool.begin(); poolit != pool.end(); poolit++)
+    {
+        if(wallets.find((*poolit).sender)==wallets.end())
+        {
+            wallets[(*poolit).sender] = 0;
+        }
+        wallets[(*poolit).sender] -= stod((*poolit).amount);
+    } // looping transaction pool
+
+    // for (auto it = wallets.begin(); it != wallets.end(); it++)
+    // {
+    //     cout << "1  id:" << (*it).first<<endl;
+    //     cout << "1 sum:" << (*it).second << endl;
+    // }
+
+    for (auto it = wallets.begin(); it != wallets.end(); it++) // looping each wallet
+    {
+        for (auto it2 = chain.begin(); it2 != chain.end(); it2++) // checking all transactions
+        {
+            for (int i = 0; i < (*it2).transactionsCount; i++)
+            {
+                //cout << "count: " << (*it2).transactionsCount << endl;
+                if ((*it2).transactions[i].reciever == (*it).first) //  count recieved memes
+                {
+                    wallets[(*it).first] += stod((*it2).transactions[i].amount);
+                    //cout << i << " Recieved: " << stod((*it2).transactions[i].amount)<<endl;
+                }
+                if ((*it2).transactions[i].sender == (*it).first) //  count sent memes
+                {
+                    wallets[(*it).first] -= stod((*it2).transactions[i].amount);
+                    //cout << i << " Sent: " << stod((*it2).transactions[i].amount)<<endl;
+                }
+            }
+        }
+    }
+    // for (auto it = wallets.begin(); it != wallets.end(); it++)
+    // {
+    //     cout << "2  id:" << (*it).first<<endl;
+    //     cout << "2 sum:" <<(*it).second << endl;
+    // }
+
+    for (auto poolit = pool.begin(); poolit != pool.end(); poolit++)
+    {
+        if (wallets[(*poolit).sender] < 0)
+        {
+            pool.erase(poolit);
+            poolit--;
+        }
+    }
+
+    //rewrite transactionpool.txt
+    ofstream poolTxt("../TransactionPool.txt");
+
+    for (auto poolit = pool.begin(); poolit != pool.end(); poolit++)
+    {
+        poolTxt << "{\n";
+        poolTxt << "\t" << (*poolit).id << "\n";
+        poolTxt << "\t" << (*poolit).timestamp << "\n";
+        poolTxt << "\t" << (*poolit).sender << "\n";
+        poolTxt << "\t" << (*poolit).reciever << "\n";
+        poolTxt << "\t" << (*poolit).amount << "\n";
+        poolTxt << "}\n";
+    }
+    poolTxt.close();
 }
 
 string CalculateDifficulty(vector<Block> &Chain)
 {
-    return "5";
+    vector<int> timestamps;
+    int i=0;
+    bool applicable = true;
+    string diffiulty =(*(Chain.end()-1)).difficultyTarget;
+    for(auto it = (Chain.end()-1); it != Chain.begin(); it--)
+    {
+        if((*it).difficultyTarget!=diffiulty) applicable=false;
+
+        timestamps.push_back(   stoi(  (*it).timestamp)-stoi((*(it-1)).timestamp )    )  ;
+
+        i++;
+        if(i==21)break;
+    }
+    sort(timestamps.begin(),timestamps.end());
+
+    if(!applicable || i!=21) return diffiulty;
+    int c=0;
+    for(auto it = timestamps.begin(); it != timestamps.end(); it++)
+    {
+        c++;
+        if(c==11)
+        {
+            cout << "difficulty change, time median:" << (*it) <<endl;
+            if((*it)<=10)
+            {
+                return to_string(stoi(diffiulty)+1);
+            }
+            if((*it)>=40)
+            {
+                return to_string(stoi(diffiulty)-1);
+            }
+            break;
+        }
+    }
+
+    return "20";
 }
 
 int main()
@@ -238,128 +366,128 @@ int main()
     ifstream userWallet(login + ".txt");
     if (!userWallet.is_open())
         return 1;
-
     User user;
     userWallet >> user.name;
     userWallet >> user.id;
     userWallet >> user.memes;
     userWallet.close();
-
-    vector<Block> Chain;
-
-    ReadChain(Chain);
-
-    // MINING ===================================================
-
-    auto it = Chain.end() - 1; // latest block
-
-    //read TransactionPool.txt
-    //add to newBlock
-
-    vector<Transaction> transactionPool;
-
-    ReadTransactionPool(transactionPool);
-
-    //NOW VALIDATE transactionPool
-    
-    
-
-
-
-
-    //
-
-    Transaction chosenOnes[128];
-    int chosenOnesC = 1;
-    chosenOnes[0].id = "Memes";
-    chosenOnes[0].timestamp = (*it).timestamp;
-    chosenOnes[0].sender = "Universe_itself";
-    chosenOnes[0].reciever = user.id;
-    chosenOnes[0].amount = to_string(1000 / pow(2, (5 - stoi((*it).difficultyTarget))));
-    for (auto it = transactionPool.begin(); it != transactionPool.end(); it++)
+    while (true)
     {
-        chosenOnes[chosenOnesC] = (*it);
-        //cout << chosenOnes[chosenOnesC].id << " ";
-        chosenOnesC++;
-        if (chosenOnesC == 128)
-            break;
-    }
-    cout << endl;
+        vector<Block> Chain;
+        ReadChain(Chain);
+        // MINING ===================================================
 
-    //do merkle hash with transactions
-    //update difficulty
+        auto it = Chain.end() - 1; // latest block
 
-    Block newBlock; //new block
-    newBlock.prevHash = HashHex((*it).prevHash + (*it).timestamp + (*it).version + (*it).merkleRootHash + (*it).difficultyTarget + (*it).nonce);
-    newBlock.timestamp = to_string(time(0));
-    newBlock.version = "1";
-    newBlock.merkleRootHash = GetMerkleHash(chosenOnes, chosenOnesC);
-    newBlock.difficultyTarget = CalculateDifficulty(Chain);
+        //read TransactionPool.txt
+        //add to newBlock
 
-    //newBlock = (*it).prevHash + to_string(time(0)) + "1" + (*it).merkleRootHash + (*it).difficultyTarget;
+        vector<Transaction> transactionPool;
 
-    //cout << newBlock.prevHash << endl;
-    //cout << newBlock.difficultyTarget << endl;
+        ReadTransactionPool(transactionPool);
 
-    // for (auto it = Chain.begin(); it != Chain.end(); it++)
-    //     cout << (*it).difficultyTarget << " ";
+        //NOW VALIDATE transactionPool
 
-    string block = newBlock.prevHash + newBlock.timestamp + newBlock.version + newBlock.merkleRootHash + newBlock.difficultyTarget;
+        ValidateTransactionPool(Chain, transactionPool);
 
-    for (int i = 0; i < 100000000; i++)
-    {
-        uint8_t *hash = HashRaw(block + to_string(i));
-        bool solved = true;
-        for (int a = 0; a < stoi(newBlock.difficultyTarget) / 2; a++)
+        //update difficulty
+
+        //new potencial block
+        Block newBlock; //new block
+        newBlock.prevHash = HashBit((*it).prevHash + (*it).timestamp + (*it).version + (*it).merkleRootHash + (*it).difficultyTarget + (*it).nonce);
+        newBlock.timestamp = to_string(time(0));
+        newBlock.version = "1";
+
+        newBlock.difficultyTarget = CalculateDifficulty(Chain);
+
+        //Choose transactions, first transaction is mining reward
+
+        Transaction chosenOnes[128];
+        int chosenOnesC = 1;
+        chosenOnes[0].id = "Memes";
+        chosenOnes[0].timestamp = newBlock.timestamp;
+        chosenOnes[0].sender = "Universe_itself";
+        chosenOnes[0].reciever = user.id;
+        chosenOnes[0].amount = to_string(1000 / pow(2, (stoi(newBlock.difficultyTarget) - 20)));
+        for (auto it = transactionPool.begin(); it != transactionPool.end(); it++)
         {
-            if (hash[a] != 0)
+            chosenOnes[chosenOnesC] = (*it);
+            //cout << chosenOnes[chosenOnesC].id << " ";
+            chosenOnesC++;
+            if (chosenOnesC == 128)
+                break;
+        }
+        //cout << endl;
+
+        newBlock.merkleRootHash = GetMerkleHash(chosenOnes, chosenOnesC);
+
+        // block header to mine
+        string block = newBlock.prevHash + newBlock.timestamp + newBlock.version + newBlock.merkleRootHash + newBlock.difficultyTarget;
+
+        time_t start = time(0);
+
+        for (int i = 0; true; i++) // actual mining
+        {
+            uint8_t *hash = HashRaw(block + to_string(i));
+            bool solved = true;
+            for (int a = 0; a < stoi(newBlock.difficultyTarget); a++)
             {
-                solved = false;
+                if ((hash[a / 8] >> (7 - (a % 8))) != 0)
+                {
+                    solved = false;
+                    break;
+                }
+            }
+
+            delete[] hash;
+
+            if (solved)
+            {
+                newBlock.nonce = to_string(i);
+                cout << "\ncode: " << i << endl;
+                cout << HashBit(block + to_string(i)) << endl;
+                break;
+            }
+
+            if (i % 100000 == 0)
+            {
+                string prevHash = (*(Chain.end() - 1)).prevHash;
+                cout << ".";
+                Chain.clear();
+                ReadChain(Chain);
+                if(prevHash!= (*(Chain.end() - 1)).prevHash)
+                {
+                    cout << "missed\n";
+                    break;
+                }
+
             }
         }
-        if (stoi(newBlock.difficultyTarget) % 2 == 1)
+
+        if (newBlock.nonce != "") // push to blockchain
         {
-            if ((hash[stoi(newBlock.difficultyTarget) / 2] >> 4) != 0)
+            ofstream write("../Blockchain.txt", std::ios_base::app);
+            write << "{\n";
+            write << "\t" << newBlock.prevHash << endl;
+            write << "\t" << newBlock.timestamp << endl;
+            write << "\t" << newBlock.version << endl;
+            write << "\t" << newBlock.merkleRootHash << endl;
+            write << "\t" << newBlock.difficultyTarget << endl;
+            write << "\t" << newBlock.nonce << endl;
+            for (int ch = 0; ch < chosenOnesC; ch++)
             {
-                solved = false;
+                write << "\t{\n";
+                write << "\t\t" << chosenOnes[ch].id << endl;
+                write << "\t\t" << chosenOnes[ch].timestamp << endl;
+                write << "\t\t" << chosenOnes[ch].sender << endl;
+                write << "\t\t" << chosenOnes[ch].reciever << endl;
+                write << "\t\t" << chosenOnes[ch].amount << endl;
+                write << "\t}\n";
             }
+            write << "}\n";
+            write.close();
         }
-        if (solved)
-        {
-            newBlock.nonce = to_string(i);
-            cout << "\ncode: " << i << endl;
-            cout << HashHex(block + to_string(i)) << endl;
-            break;
-        }
-        delete[] hash;
-        if (i % 10000 == 0)
-            cout << ".";
     }
-
-    if (newBlock.nonce != "")
-    {
-        ofstream write("../Blockchain.txt", std::ios_base::app);
-        write << "{\n";
-        write << "\t" << newBlock.prevHash << endl;
-        write << "\t" << newBlock.timestamp << endl;
-        write << "\t" << newBlock.version << endl;
-        write << "\t" << newBlock.merkleRootHash << endl;
-        write << "\t" << newBlock.difficultyTarget << endl;
-        write << "\t" << newBlock.nonce << endl;
-        for(int ch =0;ch<chosenOnesC;ch++)
-        {
-            write << "\t{\n";
-            write << "\t\t" << chosenOnes[ch].id << endl;
-            write << "\t\t" << chosenOnes[ch].timestamp << endl;
-            write << "\t\t" << chosenOnes[ch].sender << endl;
-            write << "\t\t" << chosenOnes[ch].reciever << endl;
-            write << "\t\t" << chosenOnes[ch].amount << endl;
-            write << "\t}\n";
-        }
-        write << "}\n\n";
-        write.close();
-    }
-
     system("pause");
     return 0;
 }
