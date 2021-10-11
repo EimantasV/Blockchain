@@ -8,7 +8,7 @@
   - [Trukūmai:](#trukūmai)
   - [Pliusai:](#pliusai)
   - [Ateities patobulinimai:](#ateities-patobulinimai)
-- [Instrukcijos:](#instrukcijos)
+  - [Instrukcijos:](#instrukcijos)
 
 ## Komentarai:
 * Nesivarginau daryti "centralizuotą" blockchain, iš karto dariau decentralizuotą ir kad veiktu lygiagrečiai.
@@ -46,5 +46,5 @@ Jei leikas >=40s, tai sudėtingumas sumažinamas kitiems 20 block'ų.
 * Block'ų verifikacija.
 * User'iai dalinasi data per tinklą.
 
-# Instrukcijos:
+## Instrukcijos:
 * Wait for it.
