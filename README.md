@@ -1,5 +1,13 @@
 # Blockchain
 
+## Turinys:
+- [Komentarai] (#Komentarai:)
+- [Veikimas] (#Veikimas:)
+- [Trukūmai] (#Trukūmai:)
+- [Pliusai] (#Pliusai:)
+- [Ateities patobulinimai] (#Ateities_patobulinimai:)
+- [Instrukcijos] (#Instrukcijos:)
+
 ## Komentarai:
 * Nesivarginau daryti "centralizuotą" blockchain, iš karto dariau decentralizuotą ir kad veiktu lygiagrečiai.
 * Dėl decentralizacijos negalėjau sukurti vartotojų jau turinčių valiutos "memes".
