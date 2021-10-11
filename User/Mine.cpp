@@ -441,13 +441,6 @@ int main()
 
             delete[] hash;
 
-            if (solved)
-            {
-                newBlock.nonce = to_string(i);
-                cout << "\ncode: " << i << endl;
-                cout << HashBit(block + to_string(i)) << endl;
-                break;
-            }
 
             if (i % 100000 == 0)
             {
@@ -460,8 +453,17 @@ int main()
                     cout << "missed\n";
                     break;
                 }
-
             }
+            
+            if (solved)
+            {
+                newBlock.nonce = to_string(i);
+                cout << "\ncode: " << i << endl;
+                cout << HashBit(block + to_string(i)) << endl;
+                break;
+            }
+
+
         }
 
         if (newBlock.nonce != "") // push to blockchain
