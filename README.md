@@ -1,12 +1,12 @@
 # Blockchain
 
 ## Turinys:
-- [Komentarai] (#Komentarai:)
-- [Veikimas] (#Veikimas:)
-- [Trukūmai] (#Trukūmai:)
-- [Pliusai] (#Pliusai:)
-- [Ateities patobulinimai] (#Ateities_patobulinimai:)
-- [Instrukcijos] (#Instrukcijos:)
+- [Komentarai] (#komentarai:)
+- [Veikimas] (#veikimas:)
+- [Trukūmai] (#trukūmai:)
+- [Pliusai] (#pliusai:)
+- [Ateities patobulinimai] (#ateities_patobulinimai:)
+- [Instrukcijos] (#instrukcijos:)
 
 ## Komentarai:
 * Nesivarginau daryti "centralizuotą" blockchain, iš karto dariau decentralizuotą ir kad veiktu lygiagrečiai.
