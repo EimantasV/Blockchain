@@ -6,7 +6,7 @@
     difficulty
     nonce
     {
-        hash_of_the_next_4_lines
+        Memes
         timestamp
         Universe_itself
         reciever_public_key

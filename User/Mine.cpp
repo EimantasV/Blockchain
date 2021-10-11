@@ -454,7 +454,7 @@ int main()
                     break;
                 }
             }
-            
+
             if (solved)
             {
                 newBlock.nonce = to_string(i);
@@ -462,8 +462,6 @@ int main()
                 cout << HashBit(block + to_string(i)) << endl;
                 break;
             }
-
-
         }
 
         if (newBlock.nonce != "") // push to blockchain

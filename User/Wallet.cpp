@@ -123,7 +123,14 @@ int main()
     cout << "Memes wallet login: ";
     cin >> login;
     ifstream userWallet(login+".txt");
-    if(!userWallet.is_open()) return 1;
+    if(!userWallet.is_open()){
+        cout << "User not found. Registering...\n";
+        ofstream reg(login+".txt");
+        reg << login<<endl;
+        reg << HashHex(login)<<endl;
+        reg << 0;
+        reg.close();
+    };
 
     User user;
     userWallet >> user.name;
@@ -133,9 +140,9 @@ int main()
 
     cout << "\nWallet of " << user.name << endl<<endl;
     cout << "select action:\n";
-    cout << "Show last saved memes (1)\n";
-    cout << "Recalculate memes (2)\n";
-    cout << "Make transaction (3)\n";
+    cout << "Memes balance (1)\n";
+    cout << "Make transaction (2)\n";
+    cout << "Spam transactions (3)\n";
 
     string input;
 
@@ -149,15 +156,10 @@ int main()
         {
 
         case 1:
-            cout << "Note: useless function\n";
-            cout <<"Memes: "<< user.memes<<endl;
-            break;
-
-        case 2:
             CountMemes(user.id);
         break;
 
-        case 3:
+        case 2:
             {
             string reciever;
             string cash;
@@ -176,6 +178,32 @@ int main()
                 system("pause");
             }
             
+            write << "{\n";
+            write << "\t" << HashHex(timestamp+user.id+reciever+cash) << endl;
+            write << "\t" << timestamp << endl;
+            write << "\t" << user.id << endl;
+            write << "\t" << reciever << endl;
+            write << "\t" << cash << endl;
+            write << "}\n";
+
+
+            write.close();
+            break;
+            }
+            case 3:
+            {
+            ofstream write("../TransactionPool.txt", std::ios_base::app);
+            if(!write.is_open())
+            {
+                cerr<<"bad txt";
+                system("pause");
+            }
+            for(int i=0;i<200;i++)
+            {
+
+                string reciever = "user"+to_string(i);
+                string cash = "1";
+                string timestamp = to_string(time(0));
                 write << "{\n";
                 write << "\t" << HashHex(timestamp+user.id+reciever+cash) << endl;
                 write << "\t" << timestamp << endl;
@@ -184,9 +212,9 @@ int main()
                 write << "\t" << cash << endl;
                 write << "}\n";
 
-
+            }
             write.close();
-            break;
+                break;
             }
         
         default:
