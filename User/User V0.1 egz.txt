@@ -1,0 +1,3 @@
+Name
+NameHash / tipo publicKey
+memes_count / local save

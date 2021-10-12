@@ -1,0 +1,14 @@
+{
+    hash_of_the_next_4_lines // id
+    timestamp
+    sender_public_key
+    reciever_public_key
+    amount
+}
+{
+    hash_of_the_next_4_lines
+    timestamp
+    sender_public_key
+    reciever_public_key
+    amount
+}

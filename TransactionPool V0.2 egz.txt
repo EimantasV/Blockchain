@@ -1,0 +1,14 @@
+{
+    signature_of_the_next_4_lines
+    timestamp
+    sender_public_key
+    reciever_public_key
+    amount
+}
+{
+    signature_of_the_next_4_lines
+    timestamp
+    sender_public_key
+    reciever_public_key
+    amount
+}
