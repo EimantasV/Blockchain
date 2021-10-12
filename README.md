@@ -13,7 +13,7 @@
 ## Komentarai:
 * Nesivarginau daryti "centralizuotą" blockchain, iš karto dariau decentralizuotą ir kad veiktu lygiagrečiai.
 * Dėl decentralizacijos negalėjau sukurti vartotojų jau turinčių valiutos "memes".
-* Su Wallet.cpp galima atlikti transakcija neegzistuojančiam vartotojui. (Praktiškai vartotojas pradeda egzistuot, jei jo ID yra paminėtas blockchain'e).
+* Su Wallet.cpp galima atlikti transakcijas neegzistuojantiems vartotojams. (Praktiškai vartotojas pradeda egzistuot, jei jo ID yra paminėtas blockchain'e).
 * Taip pat, nedariau pasirinktų transakcijų variacijų, nes tai nedraugautu su mano sudėtingumo sistema.
 
 
