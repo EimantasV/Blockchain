@@ -130,6 +130,7 @@ int main()
         reg << HashHex(login)<<endl;
         reg << 0;
         reg.close();
+        userWallet.open(login+".txt");
     };
 
     User user;
